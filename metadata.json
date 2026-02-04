@@ -1,0 +1,5 @@
+{
+  "name": "AMIS - Association Management System",
+  "description": "A comprehensive management system for the Computer Association at the International University of Africa. Features include member management, committee tracking, event planning, financial ledgers, and task management with role-based access control.",
+  "requestFramePermissions": []
+}

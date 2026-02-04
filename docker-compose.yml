@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:8.0
+    container_name: amis_db_container
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: amis_db
+      MYSQL_USER: amis_user
+      MYSQL_PASSWORD: amis_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - amis-network
+
+  # Backend API Service
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: amis_backend_container
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "mysql://amis_user:amis_password@db:3306/amis_db"
+      JWT_SECRET: "your_super_secret_jwt_key_change_in_production"
+      PORT: 3000
+    depends_on:
+      - db
+    networks:
+      - amis-network
+
+  # Frontend Service (Nginx serving build)
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: amis_frontend_container
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - amis-network
+
+volumes:
+  db_data:
+
+networks:
+  amis-network:
+    driver: bridge
